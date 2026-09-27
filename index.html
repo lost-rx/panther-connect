@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panther Connect</title>
+<style>
+:root{--bg:#0b1020;--panel:#131a2d;--panel2:#1b2440;--text:#f5f7ff;--muted:#9ca8c7;--accent:#7c6cff;--accent2:#ff4f81;--good:#42d3a5;--bad:#ff667d;--line:#293450}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#20285b 0,#0b1020 42%);font-family:Inter,system-ui,Arial;color:var(--text)}
+.app{max-width:1050px;margin:auto;min-height:100vh}.top{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--line)}
+.brand{font-weight:900;letter-spacing:.5px;font-size:22px}.brand span{color:var(--accent2)}.badge{font-size:12px;color:#cdd4eb;background:#222c4a;padding:7px 10px;border-radius:999px}
+main{display:grid;grid-template-columns:220px 1fr;gap:18px;padding:20px}nav{background:rgba(19,26,45,.86);border:1px solid var(--line);border-radius:18px;padding:12px;height:max-content;position:sticky;top:15px}
+nav button{display:block;width:100%;border:0;background:transparent;color:var(--muted);text-align:left;padding:13px;border-radius:11px;cursor:pointer;font-size:14px}nav button.active,nav button:hover{background:var(--panel2);color:#fff}
+.card{background:rgba(19,26,45,.94);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 12px 35px #0003}.hero{background:linear-gradient(135deg,#2a2760,#171d38);padding:25px}.hero h1{margin:0 0 8px;font-size:32px}.hero p{color:#c1c9e2;max-width:680px;line-height:1.55}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between}.tag{font-size:11px;color:#bfc7e4;background:#222c4a;border-radius:999px;padding:5px 8px}
+.post{padding:16px;border:1px solid var(--line);border-radius:15px;margin-top:11px;background:#10172a}.post h3{margin:0 0 7px;font-size:15px}.post p{margin:0;color:#d5daf0;line-height:1.5;white-space:pre-wrap}.meta{font-size:11px;color:var(--muted);margin-top:10px}
+button.primary{border:0;background:var(--accent);color:white;border-radius:11px;padding:11px 14px;font-weight:700;cursor:pointer}.primary:hover{filter:brightness(1.12)}
+button.secondary{border:1px solid var(--line);background:transparent;color:#d5daf0;border-radius:11px;padding:10px 13px;cursor:pointer}
+input,textarea{width:100%;background:#0d1426;color:white;border:1px solid var(--line);border-radius:11px;padding:12px;margin:7px 0 10px;font:inherit}textarea{min-height:110px;resize:vertical}
+.hidden{display:none}.notice{background:#152a2c;border:1px solid #27564d;color:#c8f6e8;padding:12px;border-radius:12px;font-size:13px;line-height:1.45}.error{background:#351923;border:1px solid #713044;color:#ffd5dc;padding:12px;border-radius:12px;font-size:13px;line-height:1.45}.small{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.stat{background:#11192c;border:1px solid var(--line);padding:15px;border-radius:14px}.stat b{font-size:24px}
+footer{padding:10px 24px 30px;color:#697695;font-size:11px}
+@media(max-width:720px){main{grid-template-columns:1fr}nav{position:static}.grid{grid-template-columns:1fr}.hero h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand">PANTHER <span>CONNECT</span></div><div class="badge">ANONYMOUS COMMUNITY</div></header>
+<main>
+<nav>
+<button class="active" onclick="show('home',this)">Home</button>
+<button onclick="show('feed',this)">Community Feed</button>
+<button onclick="show('topics',this)">Topics & Resources</button>
+<button onclick="show('compose',this)">Post</button>
+<button onclick="show('safety',this)">Safety Center</button>
+</nav>
+<section>
+<div id="home">
+<div class="card hero">
+<h1>Welcome to Panther Connect</h1>
+<p>A school community hub for questions, ideas, resources, activities, and general school-life conversation. Publicly, people use an anonymous display name.</p>
+<button class="primary" onclick="show('feed',document.querySelectorAll('nav button')[1])">Open community feed</button>
+</div>
+<div class="grid">
+<div class="stat"><b>6–8</b><div class="small">school grades</div></div>
+<div class="stat"><b id="homeCount">0</b><div class="small">community posts</div></div>
+</div>
+<div class="card"><h2>How posting works</h2><div class="notice">Posts are saved in a shared Supabase database. When someone creates a post, people currently viewing the feed can receive it in real time.</div></div>
+</div>
+
+<div id="feed" class="hidden">
+<div class="card"><div class="row"><h2>The Community Feed</h2><span class="tag" id="postCount">LOADING…</span></div>
+<div class="notice"><b>Anonymous to other users.</b> Your display name is public, but your real identity should not be posted. Anonymous does not mean unmoderated.</div>
+<div id="feedPosts"><div class="small">Loading posts…</div></div>
+</div></div>
+
+<div id="topics" class="hidden">
+<div class="card"><div class="row"><h2>Topics & Resources</h2><span class="tag">COMMUNITY</span></div>
+<div class="post"><h3>📚 Schoolwork</h3><p>Homework questions, study tips, tutoring ideas, and class-resource pointers.</p></div>
+<div class="post"><h3>🏀 Activities & Athletics</h3><p>Questions and reminders about activities, teams, clubs, and events.</p></div>
+<div class="post"><h3>💡 Ideas & Feedback</h3><p>Suggest improvements to school life. Critique ideas or systems rather than individual people.</p></div>
+<div class="post"><h3>🧭 Official information</h3><p>For schedules, emergencies, attendance, grades, transportation, and other official matters, use official school or district channels.</p></div>
+</div>
+</div>
+
+<div id="compose" class="hidden">
+<div class="card"><h2>Create an anonymous post</h2>
+<div class="notice">Use a nickname. Do not include a student's full name, phone number, address, private messages, exact whereabouts, password, embarrassing photo, accusation, threat, or rumor.</div>
+<label>Display name</label><input id="name" maxlength="40" placeholder="e.g. StudyBuddy">
+<label>Post</label><textarea id="body" maxlength="1000" placeholder="Share a school question, idea, resource, or general observation..."></textarea>
+<button class="primary" onclick="addPost()">Post to community</button>
+<div id="preview" style="margin-top:10px"></div>
+</div>
+</div>
+
+<div id="safety" class="hidden">
+<div class="card"><h2>Safety Center</h2>
+<div class="notice"><b>Anonymous, not consequence-free.</b><br>Do not use anonymity to bully, threaten, impersonate, expose, shame, or target another person.</div>
+<div class="post"><h3>Report & moderation</h3><p>In a production version, every post should have a report action for bullying, threats, personal information, impersonation, or targeted accusations. Moderators can review and remove reported content.</p></div>
+<div class="post"><h3>Privacy</h3><p>The public feed should expose only the anonymous display name, post text, and posting time. Keep account and moderation data separate from public posts.</p></div>
+<div class="post"><h3>Emergency rule</h3><p>This app is not an emergency service. Immediate safety concerns should go to a trusted adult or appropriate emergency/school safety service.</p></div>
+</div>
+</div>
+</section>
+</main>
+<footer>Prototype • Uses Supabase for shared posts • Not an official Pulaski Heights Middle School or Little Rock School District service.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Replace these two placeholders with values from your Supabase project's Connect/API settings.
+const SUPABASE_URL = "https://ykjslddvcbztrryllsjc.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_OzrjReziOFWjGv7iuo7BTg_rqZq5qWN";
+
+let supabaseClient = null;
+let posts = [];
+
+function show(id,btn){
+  document.querySelectorAll('section>div').forEach(x=>x.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function formatTime(value){
+  const d=new Date(value);
+  return isNaN(d) ? "just now" : d.toLocaleString([], {dateStyle:'medium',timeStyle:'short'});
+}
+
+function renderPosts(){
+  const feed=document.getElementById('feedPosts');
+  const count=document.getElementById('postCount');
+  const homeCount=document.getElementById('homeCount');
+  count.textContent=posts.length+" POSTS";
+  homeCount.textContent=posts.length;
+  if(!posts.length){feed.innerHTML='<div class="small">No posts yet. Be the first to start the conversation.</div>';return;}
+  feed.innerHTML=posts.map(p=>`
+    <div class="post">
+      <div class="row"><h3>${esc(p.display_name)}</h3><span class="tag">COMMUNITY</span></div>
+      <p>${esc(p.body)}</p>
+      <div class="meta">${formatTime(p.created_at)} • Anonymous display name</div>
+    </div>`).join('');
+}
+
+async function loadPosts(){
+  if(!supabaseClient)return;
+  const {data,error}=await supabaseClient.from('posts')
+    .select('id,display_name,body,created_at')
+    .eq('status','published')
+    .order('created_at',{ascending:false})
+    .limit(100);
+  if(error){
+    document.getElementById('feedPosts').innerHTML='<div class="error">Could not load the shared feed. Check your Supabase setup and Row Level Security policies.</div>';
+    return;
+  }
+  posts=data||[];
+  renderPosts();
+}
+
+async function addPost(){
+  const name=(document.getElementById('name').value.trim()||'Anonymous Panther').slice(0,40);
+  const body=document.getElementById('body').value.trim();
+  const preview=document.getElementById('preview');
+  if(!body){preview.innerHTML='<div class="error">Write something first.</div>';return;}
+  if(!supabaseClient){preview.innerHTML='<div class="error">Supabase is not configured yet. Add your project URL and publishable key in the code.</div>';return;}
+
+  const button=document.querySelector('#compose .primary');
+  button.disabled=true; button.textContent='Posting…';
+
+  const {data,error}=await supabaseClient.from('posts')
+    .insert({display_name:name,body:body})
+    .select('id,display_name,body,created_at')
+    .single();
+
+  button.disabled=false; button.textContent='Post to community';
+
+  if(error){
+    preview.innerHTML='<div class="error">Your post was not saved: '+esc(error.message)+'</div>';
+    return;
+  }
+
+  document.getElementById('name').value='';
+  document.getElementById('body').value='';
+  preview.innerHTML='<div class="notice">Posted to the shared community feed.</div>';
+
+  // Add immediately for this browser. Realtime will update other browsers.
+  if(data && !posts.some(p=>p.id===data.id)){posts.unshift(data);renderPosts();}
+  show('feed',document.querySelectorAll('nav button')[1]);
+}
+
+function subscribeToPosts(){
+  supabaseClient.channel('public-posts')
+    .on('postgres_changes',
+      {event:'INSERT',schema:'public',table:'posts',filter:'status=eq.published'},
+      payload=>{
+        const p=payload.new;
+        if(!posts.some(x=>x.id===p.id)){posts.unshift(p);renderPosts();}
+      })
+    .subscribe();
+}
+
+async function start(){
+  if(SUPABASE_URL.startsWith('YOUR_') || SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_')){
+    document.getElementById('feedPosts').innerHTML='<div class="notice"><b>Supabase setup needed.</b><br>Open this file and replace the two YOUR_SUPABASE_ placeholders with your project URL and publishable key.</div>';
+    return;
+  }
+  supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+  await loadPosts();
+  subscribeToPosts();
+}
+start();
+</script>
+</body>
+</html>
